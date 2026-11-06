@@ -26,7 +26,11 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
       },
       manifest: {
-        id: BASE,
+        // Chrome identifies an installed app by this id. It was '/catch-prog/' until a
+        // stale install record on the coach's phone blocked installing; a new id makes
+        // Chrome treat it as a fresh app. Don't change it again: existing installs
+        // would show up as a separate app.
+        id: `${BASE}launch`,
         name: 'Launch — rowing coach',
         short_name: 'Launch',
         description: 'Stroke rate, stopwatches, staggered starts and crew notes for the coaching launch.',
