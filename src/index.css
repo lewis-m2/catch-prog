@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme "Sun" (default). */
+:root {
+  --bg: #ffffff;
+  --surface: #f2f4f5;
+  --ink: #0b0f12;
+  --muted: #5b6670;
+  --accent: #0057ff;
+  --go: #00a35c;
+  --stop: #e5322d;
+  --warn: #f5a400;
+  color-scheme: light;
+}
+
+/* Theme "Dawn" (dark). Same accents, slightly brighter. */
+:root[data-theme='dawn'] {
+  --bg: #0b0f12;
+  --surface: #1a2026;
+  --ink: #f4f6f8;
+  --muted: #a3aeb8;
+  --accent: #2f74ff;
+  --go: #00c26e;
+  --stop: #ff4d47;
+  --warn: #ffb81f;
+  color-scheme: dark;
+}
+
+html {
+  /* Stops double-tap zoom, which a hurried or wet tap can easily trigger. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* The app shell scrolls inside <main>; no pull-to-refresh on the page itself. */
+  overscroll-behavior: none;
+}
+
+button {
+  user-select: none;
+}
+
+/* Every time on screen uses this, so digits don't shift as they change. */
+.time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
