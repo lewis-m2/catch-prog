@@ -2,7 +2,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { SessionBar } from './components/SessionBar';
 import { TabBar } from './components/TabBar';
 import { UpdatePrompt } from './components/UpdatePrompt';
-import { useTheme } from './hooks/useTheme';
+import { useApplyTheme } from './hooks/useTheme';
 import { Crews } from './screens/Crews';
 import { Pieces } from './screens/Pieces';
 import { Rate } from './screens/Rate';
@@ -10,7 +10,7 @@ import { Settings } from './screens/Settings';
 import { Timers } from './screens/Timers';
 
 export function App() {
-  const [theme, setTheme] = useTheme();
+  useApplyTheme();
 
   return (
     // HashRouter keeps the route after the #, so GitHub Pages only ever has to
@@ -25,7 +25,7 @@ export function App() {
             <Route path="/pieces" element={<Pieces />} />
             <Route path="/crews" element={<Crews />} />
             {/* Nested under /crews so the Crews tab stays highlighted. */}
-            <Route path="/crews/settings" element={<Settings theme={theme} onThemeChange={setTheme} />} />
+            <Route path="/crews/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/rate" replace />} />
           </Routes>
         </main>

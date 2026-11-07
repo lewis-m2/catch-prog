@@ -6,6 +6,7 @@ import { useHaptics } from '../hooks/useHaptics';
 import { useWakeLock } from '../hooks/useWakeLock';
 import type { ThemeSetting } from '../lib/theme';
 import type { WakeLockStatus } from '../lib/wake-lock';
+import { useSettings } from '../state/settings';
 
 const THEMES: { value: ThemeSetting; label: string }[] = [
   { value: 'sun', label: 'Sun' },
@@ -20,13 +21,10 @@ const WAKE_LOCK_TEXT: Record<WakeLockStatus, string> = {
   failed: 'Phone refused (low battery mode?)',
 };
 
-interface Props {
-  theme: ThemeSetting;
-  onThemeChange: (theme: ThemeSetting) => void;
-}
-
-export function Settings({ theme, onThemeChange }: Props) {
+export function Settings() {
   const haptics = useHaptics();
+  const theme = useSettings((state) => state.theme);
+  const setTheme = useSettings((state) => state.setTheme);
   // Temporary test control: from Phase 2 the lock follows the active session.
   const [testWakeLock, setTestWakeLock] = useState(false);
   const wakeLockStatus = useWakeLock(testWakeLock);
@@ -59,7 +57,7 @@ export function Settings({ theme, onThemeChange }: Props) {
                 variant={selected ? 'primary' : 'secondary'}
                 aria-pressed={selected}
                 className="min-h-primary flex-1"
-                onClick={() => onThemeChange(value)}
+                onClick={() => setTheme(value)}
               >
                 {selected ? `✓ ${label}` : label}
               </BigButton>
