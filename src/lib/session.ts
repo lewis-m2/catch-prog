@@ -55,7 +55,6 @@ export function sessionTimes(session: Session, now: number) {
 
 export interface PieceDetails {
   label: string;
-  targetSec?: number;
 }
 
 /** A new piece, with its clock running. */
@@ -65,7 +64,6 @@ export function createPiece(id: string, sessionId: string, details: PieceDetails
     sessionId,
     kind: 'simple',
     label: details.label,
-    targetSec: details.targetSec,
     startedAt: at,
     clock: startStopwatch(newStopwatch(), at),
     splitsMs: [],

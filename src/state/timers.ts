@@ -23,7 +23,7 @@ interface TimersState {
   session: Session | null;
   /** The piece on the piece clock (running, or stopped until reset). */
   piece: Piece | null;
-  /** Label and target for the next piece, kept after a reset for repeats. */
+  /** Label for the next piece, kept after a reset for repeats. */
   details: PieceDetails;
 
   load: () => Promise<void>;
@@ -62,7 +62,7 @@ export const useTimers = create<TimersState>()((set, get) => {
 
     load: async () => {
       const { session, piece } = await loadActiveSession();
-      set({ session, piece, ...(piece && { details: { label: piece.label, targetSec: piece.targetSec } }) });
+      set({ session, piece, ...(piece && { details: { label: piece.label } }) });
     },
 
     startSession: (at) => {

@@ -1,5 +1,43 @@
 # Changelog
 
+## Phase 3: Crews, prognostics & settings
+
+**What changed**
+- **Target time removed** from the piece clock, at the coach's request. Pieces keep their label and splits.
+- **Built-in prognostic tables** for School and Club (110 events), in `src/data/prognostics-default.csv`. They come from
+  the 'App CSV' sheet of `docs/NZ_Rowing_Prognostics_DRAFT.xlsx`. These are still the spreadsheet's **draft placeholder
+  times**; replace that CSV when the real figures are in.
+- **Your edits are kept separately** from the built-in rows. An edited row shows ●, with Reset per row or for a whole table.
+  A future update can ship new built-in times without losing them. Setting a row back to its built-in time removes the edit.
+- **CSV import** (paste, or choose a file) shows what will change before importing.
+  - Columns copied straight from a spreadsheet work too.
+  - **Merge** keeps your other edits.
+  - **Replace** clears them, and asks first.
+- **CSV export** downloads the whole table.
+- **Programme** (School / Club / Both): asked the first time you open Crews. It decides the grades and tables shown.
+- **Crews:**
+  - Add, edit and delete (delete asks first).
+  - Each crew has a name, gender, boat, grade, an optional crew override 2k, and optional athletes by seat.
+  - The list shows each crew's 2k time and where it comes from (table / crew override).
+- **Quick add:** paste `name, boat, gender, grade` lines. Good lines are previewed and bad ones explained before anything is added.
+- **Time editor** (crew override, table rows): big −5 / −1 / +1 / +5 s buttons, or type a time.
+  The drum picker from SPEC §5a is added to this editor in Phase 4.
+- **Settings** (SPEC §7):
+  - Appearance: accent colour (6 presets or custom), go/stop colours (default, colour-blind safe, or custom), text size.
+    A colour that's hard to read on a background gets a warning. Text on a custom colour is black or white, whichever reads better.
+  - Stroke-rate defaults and start-gap rounding (used in Phase 4).
+  - Vibration on/off and keep-screen-on on/off.
+  - Data: export a JSON backup, import one, and clear all data (asks twice). Import and clear wait until no session is running.
+- **Rate screen:** a crew chip above the pad. Readings are saved against the chosen crew.
+- The working-time rule is in `lib/prognostic.ts` and tested: session adjustment → crew override → table row.
+
+**How to try it**
+- Crews: choose your programme, then add a crew, tap it, and set a crew override with the ± buttons.
+- Quick add: paste a few lines, including a wrong one, to see the preview.
+- Settings → Prognostic tables: tap a row, change it, then check that a crew of that event follows. Try Import CSV with a pasted line.
+- Settings → Appearance: try an accent, colour-blind safe and Extra large text, then look at Timers and Rate.
+- Settings → Data: Export backup, Clear all data, then Import backup to restore it.
+
 ## Phase 2: Timers
 
 **What changed**

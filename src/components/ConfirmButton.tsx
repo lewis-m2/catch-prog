@@ -5,6 +5,9 @@ interface Props {
   label: string;
   question: string;
   confirmLabel: string;
+  /** For the most destructive actions: asks a second time before acting. */
+  secondQuestion?: string;
+  secondConfirmLabel?: string;
   onConfirm: () => void;
 }
 
@@ -12,34 +15,38 @@ interface Props {
 const ARM_DELAY_MS = 500;
 
 /** For destructive actions: the first tap asks, a second, separate tap confirms. */
-export function ConfirmButton({ label, question, confirmLabel, onConfirm }: Props) {
-  const [armedAt, setArmedAt] = useState<number | null>(null);
+export function ConfirmButton({ label, question, confirmLabel, secondQuestion, secondConfirmLabel, onConfirm }: Props) {
+  const [armed, setArmed] = useState<{ at: number; step: 1 | 2 } | null>(null);
 
-  if (armedAt === null) {
+  if (armed === null) {
     return (
-      <BigButton variant="secondary" className="w-full" onClick={() => setArmedAt(Date.now())}>
+      <BigButton variant="secondary" className="w-full" onClick={() => setArmed({ at: Date.now(), step: 1 })}>
         {label}
       </BigButton>
     );
   }
 
+  const second = armed.step === 2;
+  const text = second ? secondQuestion! : question;
+
   return (
-    <div role="group" aria-label={question} className="flex flex-col gap-2">
-      <p className="text-lg font-bold">{question}</p>
+    <div role="group" aria-label={text} className="flex flex-col gap-2">
+      <p className="text-lg font-bold">{text}</p>
       <div className="flex gap-2">
-        <BigButton variant="secondary" className="min-h-primary flex-1" onClick={() => setArmedAt(null)}>
+        <BigButton variant="secondary" size="primary" className="flex-1" onClick={() => setArmed(null)}>
           Cancel
         </BigButton>
         <BigButton
           variant="stop"
           className="flex-1"
           onClick={() => {
-            if (Date.now() - armedAt < ARM_DELAY_MS) return;
-            setArmedAt(null);
+            if (Date.now() - armed.at < ARM_DELAY_MS) return;
+            if (!second && secondQuestion) return setArmed({ at: Date.now(), step: 2 });
+            setArmed(null);
             onConfirm();
           }}
         >
-          {confirmLabel}
+          {second ? (secondConfirmLabel ?? confirmLabel) : confirmLabel}
         </BigButton>
       </div>
     </div>

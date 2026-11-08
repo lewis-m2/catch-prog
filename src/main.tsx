@@ -2,13 +2,13 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import { requestPersistentStorage } from './db/sessions';
-import { applyTheme } from './hooks/useTheme';
+import { applyAppearance } from './hooks/useTheme';
 import './index.css';
 import { useSettings } from './state/settings';
 import { useTimers } from './state/timers';
 
 // Before the first render, so a dark-theme user doesn't get a white flash.
-applyTheme(useSettings.getState().theme);
+applyAppearance(useSettings.getState());
 
 requestPersistentStorage().catch(() => {});
 

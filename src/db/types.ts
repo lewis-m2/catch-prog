@@ -1,4 +1,5 @@
 // Stored records (SPEC §8). Every record has a UUID and `updatedAt` so sync can be added later.
+import type { Gender, Program } from '../lib/programme';
 import type { StrokeCount } from '../lib/rate';
 import type { Stopwatch } from '../lib/time';
 
@@ -28,7 +29,6 @@ export interface Piece {
   sessionId: string;
   kind: 'simple';
   label: string;
-  targetSec?: number;
   startedAt: Ms;
   clock: Stopwatch;
   stoppedAt?: Ms;
@@ -45,5 +45,39 @@ export interface RateReading {
   strokes: StrokeCount;
   crewId?: string;
   pieceId?: string;
+  updatedAt: Ms;
+}
+
+export interface Athlete {
+  seat: string;
+  name: string;
+}
+
+export interface Crew {
+  id: string;
+  name: string;
+  /** Stored on the crew, so changing the programme setting never breaks it. */
+  program: Program;
+  boatClass: string;
+  gender: Gender;
+  grade: string;
+  /** For a crew faster or slower than its grade. Used instead of the table. */
+  overrideProg2kSec?: number;
+  athletes?: Athlete[];
+  archived?: boolean;
+  createdAt: Ms;
+  updatedAt: Ms;
+}
+
+/** The coach's edit to one row of a built-in table, or a row they added. */
+export interface PrognosticOverride {
+  id: string;
+  /** `program|boatClass|gender|grade`, from `progKey`. One edit per event. */
+  key: string;
+  program: Program;
+  boatClass: string;
+  gender: Gender;
+  grade: string;
+  prog2kSec: number;
   updatedAt: Ms;
 }

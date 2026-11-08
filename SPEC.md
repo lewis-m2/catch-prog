@@ -44,7 +44,7 @@ Two independent stopwatches on one screen.
 
 ### 3b. Piece clock
 - Start / Stop / Reset, plus a **Split** button (records lap times; shows split and cumulative).
-- Optional piece label (e.g. "3 × 500m #2") and target time; shows +/- against target.
+- Optional piece label (e.g. "3 × 500m #2"). (Target time was dropped: the coach found no use for it.)
 - When stopped, the piece is saved to the current session with its splits.
 
 ## 4. Crews & prognostic times

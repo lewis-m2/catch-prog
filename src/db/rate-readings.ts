@@ -9,6 +9,7 @@ export async function saveRateReading(reading: {
   strokes: StrokeCount;
   sessionId?: string;
   pieceId?: string;
+  crewId?: string;
 }): Promise<RateReading> {
   const record: RateReading = { id: newId(), ...reading, updatedAt: Date.now() };
   await db.rateReadings.add(record);

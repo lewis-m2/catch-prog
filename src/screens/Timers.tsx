@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { ConfirmButton } from '../components/ConfirmButton';
 import { TimingButton } from '../components/TimingButton';
 import { useNow } from '../hooks/useNow';
 import { sessionTimes, splitRows } from '../lib/session';
-import { elapsedMs, formatClock, formatSigned, isRunning, parseDuration } from '../lib/time';
+import { elapsedMs, formatClock, isRunning } from '../lib/time';
 import type { WakeLockStatus } from '../lib/wake-lock';
 import { useTimers } from '../state/timers';
 
@@ -56,7 +55,7 @@ function SessionSection({ now }: { now: number }) {
       </div>
 
       <div>
-        <p className="time text-[72px] leading-none" aria-label={`Rowing time ${formatClock(times.rowingMs, { tenths: false })}`}>
+        <p className="time text-[min(4.5rem,24vw)] leading-none" aria-label={`Rowing time ${formatClock(times.rowingMs, { tenths: false })}`}>
           {formatClock(times.rowingMs, { tenths: false })}
         </p>
         <p className="mt-1 text-lg text-muted">
@@ -91,8 +90,6 @@ function PieceSection({ now }: { now: number }) {
   const running = piece !== null && isRunning(piece.clock);
   const pieceMs = piece ? elapsedMs(piece.clock, now) : 0;
   const rows = piece ? splitRows(piece.splitsMs, running ? undefined : pieceMs) : [];
-  const targetMs = details.targetSec !== undefined ? details.targetSec * 1000 : undefined;
-  const overTarget = targetMs !== undefined && pieceMs > targetMs;
 
   return (
     <section aria-labelledby="piece-heading" className="flex flex-col gap-3 border-t-2 border-surface pt-4">
@@ -100,31 +97,17 @@ function PieceSection({ now }: { now: number }) {
         Piece
       </h2>
 
-      <div className="flex gap-2">
-        <label className="flex flex-1 flex-col gap-1">
-          <span className="text-base font-semibold text-muted">Label (optional)</span>
-          <input
-            value={details.label}
-            onChange={(event) => setDetails({ label: event.target.value })}
-            placeholder="e.g. 3 × 500m #2"
-            className="min-h-control w-full rounded-xl border-2 border-surface bg-bg px-3 text-lg"
-          />
-        </label>
-        <TargetInput targetSec={details.targetSec} onChange={(targetSec) => setDetails({ targetSec })} />
-      </div>
+      <label className="flex flex-col gap-1">
+        <span className="text-base font-semibold text-muted">Label (optional)</span>
+        <input
+          value={details.label}
+          onChange={(event) => setDetails({ label: event.target.value })}
+          placeholder="e.g. 3 × 500m #2"
+          className="min-h-control w-full rounded-xl border-2 border-surface bg-bg px-3 text-lg"
+        />
+      </label>
 
-      <p className="time text-[80px] leading-none">{formatClock(pieceMs)}</p>
-
-      {targetMs !== undefined && piece && (
-        // While running, the colour only appears once the target is passed; the sign always says which way.
-        <p className="text-xl font-bold">
-          <span className="text-muted">vs target </span>
-          <span className={`time ${!running || overTarget ? (overTarget ? 'text-stop' : 'text-go') : ''}`}>
-            {formatSigned(pieceMs - targetMs)}
-          </span>
-          {!running && <span className="text-muted">{overTarget ? ' slower' : ' faster'}</span>}
-        </p>
-      )}
+      <p className="time text-[min(5rem,25vw)] leading-none">{formatClock(pieceMs)}</p>
 
       {!piece && (
         <TimingButton variant="go" onPress={startPiece}>
@@ -176,47 +159,5 @@ function PieceSection({ now }: { now: number }) {
         </table>
       )}
     </section>
-  );
-}
-
-/** Target time typed as m:ss. Only saved once it's a valid time. */
-function TargetInput({ targetSec, onChange }: { targetSec?: number; onChange: (targetSec?: number) => void }) {
-  const [text, setText] = useState(targetSec !== undefined ? formatClock(targetSec * 1000) : '');
-  const [invalid, setInvalid] = useState(false);
-
-  const commit = () => {
-    if (text.trim() === '') {
-      setInvalid(false);
-      onChange(undefined);
-      return;
-    }
-    const ms = parseDuration(text);
-    setInvalid(ms === null);
-    if (ms !== null) {
-      onChange(ms / 1000);
-      setText(formatClock(ms));
-    }
-  };
-
-  return (
-    <label className="flex w-32 flex-col gap-1">
-      <span className="text-base font-semibold text-muted">Target</span>
-      <input
-        value={text}
-        inputMode="decimal"
-        placeholder="m:ss"
-        aria-invalid={invalid}
-        aria-describedby={invalid ? 'target-error' : undefined}
-        onChange={(event) => setText(event.target.value)}
-        onBlur={commit}
-        onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.blur()}
-        className={`time min-h-control w-full rounded-xl border-2 bg-bg px-3 text-lg ${invalid ? 'border-stop' : 'border-surface'}`}
-      />
-      {invalid && (
-        <span id="target-error" className="text-sm font-bold text-stop">
-          Use m:ss, e.g. 1:45
-        </span>
-      )}
-    </label>
   );
 }

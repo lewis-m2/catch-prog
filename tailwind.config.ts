@@ -15,6 +15,9 @@ export default {
         go: 'var(--go)',
         stop: 'var(--stop)',
         warn: 'var(--warn)',
+        'on-accent': 'var(--on-accent)',
+        'on-go': 'var(--on-go)',
+        'on-stop': 'var(--on-stop)',
       },
       minHeight: {
         primary: '64px', // primary buttons

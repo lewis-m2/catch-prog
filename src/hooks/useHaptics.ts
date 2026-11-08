@@ -1,11 +1,16 @@
 import { HAPTIC_GO, HAPTIC_TAP, vibrate } from '../lib/haptics';
+import { useSettings } from '../state/settings';
 
-const haptics = {
-  tap: () => vibrate(HAPTIC_TAP),
-  go: () => vibrate(HAPTIC_GO),
+// Checks the on/off setting at the moment of the tap, so it applies at once.
+const whenOn = (pattern: VibratePattern) => () => {
+  if (useSettings.getState().haptics) vibrate(pattern);
 };
 
-/** The on/off setting from SPEC §7d will be checked here when Settings arrives in Phase 3. */
+const haptics = {
+  tap: whenOn(HAPTIC_TAP),
+  go: whenOn(HAPTIC_GO),
+};
+
 export function useHaptics() {
   return haptics;
 }

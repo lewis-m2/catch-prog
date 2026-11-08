@@ -53,7 +53,7 @@ describe('session clock', () => {
 });
 
 describe('piece clock', () => {
-  const start = () => createPiece('p1', 's1', { label: '3 × 500m #1', targetSec: 105 }, START);
+  const start = () => createPiece('p1', 's1', { label: '3 × 500m #1' }, START);
 
   it('records splits as elapsed piece time', () => {
     let piece = start();

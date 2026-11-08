@@ -1,6 +1,8 @@
 import { useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { BigButton } from '../components/BigButton';
+import { Sheet } from '../components/Sheet';
 import { saveRateReading } from '../db/rate-readings';
+import { useCrews } from '../hooks/useData';
 import { useHaptics } from '../hooks/useHaptics';
 import { useNow } from '../hooks/useNow';
 import { formatSpm, isExpired, STROKE_COUNTS, tap, trend, type RateOptions, type Trend } from '../lib/rate';
@@ -24,6 +26,11 @@ export function Rate() {
   const haptics = useHaptics();
   const rateSettings = useSettings((state) => state.rate);
   const setStrokes = useSettings((state) => state.setRateStrokes);
+  const crewId = useSettings((state) => state.rateCrewId);
+  const crews = useCrews();
+  // A deleted crew simply drops off the chip.
+  const crew = crews?.find((c) => c.id === crewId);
+  const [pickingCrew, setPickingCrew] = useState(false);
   const options: RateOptions = {
     strokes: rateSettings.strokes,
     continuous: rateSettings.continuous,
@@ -59,6 +66,7 @@ export function Rate() {
         spm: outcome.spm,
         strokes: options.strokes,
         sessionId: session?.id,
+        crewId: crew?.id,
         pieceId: piece && isRunning(piece.clock) ? piece.id : undefined,
       }).catch((error: unknown) => console.error('Could not save rate reading', error));
     }
@@ -85,6 +93,31 @@ export function Rate() {
 
   return (
     <div className="flex h-full flex-col gap-3">
+      <BigButton
+        variant="secondary"
+        aria-label={`Crew: ${crew ? crew.name : 'none'}. Change crew.`}
+        className="flex items-center justify-between gap-2 text-left"
+        onClick={() => setPickingCrew(true)}
+      >
+        <span className="truncate">
+          <span className="font-semibold text-muted">Crew </span>
+          {crew ? crew.name : 'none'}
+        </span>
+        <span aria-hidden="true" className="text-muted">
+          ▾
+        </span>
+      </BigButton>
+      {pickingCrew && (
+        <CrewPicker
+          selectedId={crew?.id ?? null}
+          crews={crews ?? []}
+          onPick={(id) => {
+            useSettings.getState().update({ rateCrewId: id });
+            setPickingCrew(false);
+          }}
+          onClose={() => setPickingCrew(false)}
+        />
+      )}
       <div role="group" aria-label="Strokes per measurement" className="flex items-center gap-2">
         <span className="pr-1 text-lg font-bold text-muted">Strokes</span>
         {STROKE_COUNTS.map((count) => {
@@ -109,7 +142,7 @@ export function Rate() {
 
       <div className="flex items-end justify-between gap-2">
         <p aria-live="polite" aria-atomic="true">
-          <span className="time text-[96px] leading-none">{latest !== undefined ? formatSpm(latest) : '––.–'}</span>
+          <span className="time text-[min(6rem,26vw)] leading-none">{latest !== undefined ? formatSpm(latest) : '––.–'}</span>
           <span className="ml-2 text-xl font-bold text-muted">spm</span>
         </p>
         {direction && change !== undefined && (
@@ -147,7 +180,7 @@ export function Rate() {
         // touch-none: no scrolling or zooming, so every touch is a tap.
         // Black on green: white on green is too faint in sunlight.
         className={`flex min-h-[50%] flex-1 touch-none select-none flex-col items-center justify-center gap-2 rounded-2xl active:brightness-90 ${
-          timing ? 'bg-go text-black' : 'bg-accent text-white'
+          timing ? 'bg-go text-on-go' : 'bg-accent text-on-accent'
         }`}
       >
         <span className="text-4xl font-extrabold">{timing ? 'Tap again at the catch' : 'Tap at the catch'}</span>
@@ -158,5 +191,41 @@ export function Rate() {
         </span>
       </button>
     </div>
+  );
+}
+
+function CrewPicker({
+  crews,
+  selectedId,
+  onPick,
+  onClose,
+}: {
+  crews: { id: string; name: string }[];
+  selectedId: string | null;
+  onPick: (id: string | null) => void;
+  onClose: () => void;
+}) {
+  const options = [{ id: null, name: 'No crew' }, ...crews];
+  return (
+    <Sheet title="Readings are for" onClose={onClose}>
+      <div className="flex flex-col gap-2">
+        {options.map((option) => {
+          const selected = option.id === selectedId;
+          return (
+            <BigButton
+              key={option.id ?? 'none'}
+              variant={selected ? 'primary' : 'secondary'}
+              size="primary"
+              aria-pressed={selected}
+              className="text-left"
+              onClick={() => onPick(option.id)}
+            >
+              {selected ? `✓ ${option.name}` : option.name}
+            </BigButton>
+          );
+        })}
+        {crews.length === 0 && <p className="text-lg text-muted">Add crews on the Crews tab.</p>}
+      </div>
+    </Sheet>
   );
 }
