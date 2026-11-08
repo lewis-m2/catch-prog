@@ -4,7 +4,9 @@ import { saveRateReading } from '../db/rate-readings';
 import { useHaptics } from '../hooks/useHaptics';
 import { useNow } from '../hooks/useNow';
 import { formatSpm, isExpired, STROKE_COUNTS, tap, trend, type RateOptions, type Trend } from '../lib/rate';
+import { isRunning, tapTime } from '../lib/time';
 import { useSettings } from '../state/settings';
+import { useTimers } from '../state/timers';
 
 const HISTORY_LENGTH = 6;
 const MISSED_SHOW_MS = 1500;
@@ -15,13 +17,8 @@ const TREND_TEXT: Record<Trend, { arrow: string; label: string }> = {
   steady: { arrow: '→', label: 'steady' },
 };
 
-/**
- * When the finger touched the screen, as epoch ms. `event.timeStamp` is
- * recorded at the moment of input, so it is more accurate than reading the
- * clock in the handler, and touching down is earlier than a click (which waits
- * for the finger to lift).
- */
-const tapTime = (event: { timeStamp: number }) => performance.timeOrigin + event.timeStamp;
+// The pad acts on touch-down, which is earlier than a click (that waits for the
+// finger to lift), and `tapTime` corrects for any delay before the handler runs.
 
 export function Rate() {
   const haptics = useHaptics();
@@ -55,21 +52,27 @@ export function Rate() {
     } else if (outcome.kind === 'reading') {
       setMissedAt(null);
       setReadings((previous) => [outcome.spm, ...previous].slice(0, HISTORY_LENGTH));
-      saveRateReading({ at: Math.round(at), spm: outcome.spm, strokes: options.strokes }).catch((error: unknown) =>
-        console.error('Could not save rate reading', error),
-      );
+      // Linked to the session and to the piece if one is running, so the log shows rate per piece.
+      const { session, piece } = useTimers.getState();
+      saveRateReading({
+        at: Math.round(at),
+        spm: outcome.spm,
+        strokes: options.strokes,
+        sessionId: session?.id,
+        pieceId: piece && isRunning(piece.clock) ? piece.id : undefined,
+      }).catch((error: unknown) => console.error('Could not save rate reading', error));
     }
   };
 
   const onPointerDown = (event: PointerEvent) => {
     if (!event.isPrimary) return; // ignore a second finger or a wet palm
-    onTap(tapTime(event));
+    onTap(tapTime(event.timeStamp));
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
     if ((event.key === ' ' || event.key === 'Enter') && !event.repeat) {
       event.preventDefault();
-      onTap(tapTime(event));
+      onTap(tapTime(event.timeStamp));
     }
   };
 

@@ -1,5 +1,30 @@
 # Changelog
 
+## Phase 2: Timers
+
+**What changed**
+- Timers screen (SPEC §3):
+  - **Session clock**: Start, Pause for a break, Resume. Shows rowing time, total time and break time.
+    End session asks first and saves the session.
+  - **Piece clock**: Start, Split, Stop, Reset, with an optional label and target time (`m:ss`).
+    It shows the difference from the target, and splits as lap and total, plus a Finish row after Stop.
+    Stopping saves the piece to the session.
+  - **Undo stop** (an addition to the spec): an accidental Stop can be undone, and the clock carries on as though it had never stopped.
+  - Starting a piece also starts the session, or ends a break, so a piece always belongs to a session.
+- **SessionBar** is live on every screen: rowing time (or "Break"), and the piece time while a piece runs.
+- Clocks are stored as start time + time already counted, and saved to IndexedDB on every start, stop and split.
+  A reload, crash or screen lock loses nothing.
+- Start, Stop and Split act when the finger touches down, like the rate pad.
+- The screen stays awake for the whole session, breaks included. Timers shows a warning if the phone refuses.
+- Rate readings are now linked to the session, and to the piece while one is running.
+- The update and "ready offline" banners wait until no session is running, so they can't cover Split or Stop.
+- Fix: tap times now use the wall clock. The browser's page clock can fall behind after the phone sleeps.
+
+**How to try it**
+- Timers: Start session → Pause/Resume → Start piece → Split a few times → Stop → Undo stop → Stop → Reset.
+- Reload mid-piece, or close the app and reopen it: both clocks carry on where they were.
+- End session: the first tap asks and the second confirms. A fast double tap won't end it.
+
 ## Phase 1: Stroke rate
 
 **What changed**

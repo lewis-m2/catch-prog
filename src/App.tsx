@@ -3,14 +3,19 @@ import { SessionBar } from './components/SessionBar';
 import { TabBar } from './components/TabBar';
 import { UpdatePrompt } from './components/UpdatePrompt';
 import { useApplyTheme } from './hooks/useTheme';
+import { useWakeLock } from './hooks/useWakeLock';
 import { Crews } from './screens/Crews';
 import { Pieces } from './screens/Pieces';
 import { Rate } from './screens/Rate';
 import { Settings } from './screens/Settings';
 import { Timers } from './screens/Timers';
+import { useTimers } from './state/timers';
 
 export function App() {
   useApplyTheme();
+  // Keep the screen on for the whole session, breaks included.
+  const sessionActive = useTimers((state) => state.session !== null);
+  const wakeLock = useWakeLock(sessionActive);
 
   return (
     // HashRouter keeps the route after the #, so GitHub Pages only ever has to
@@ -21,7 +26,7 @@ export function App() {
         <main className="min-h-0 flex-1 overflow-y-auto p-4">
           <Routes>
             <Route path="/rate" element={<Rate />} />
-            <Route path="/timers" element={<Timers />} />
+            <Route path="/timers" element={<Timers wakeLock={wakeLock} />} />
             <Route path="/pieces" element={<Pieces />} />
             <Route path="/crews" element={<Crews />} />
             {/* Nested under /crews so the Crews tab stays highlighted. */}

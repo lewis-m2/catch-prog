@@ -1,4 +1,5 @@
 import { useRegisterSW } from 'virtual:pwa-register/react';
+import { useTimers } from '../state/timers';
 import { BigButton } from './BigButton';
 
 /** Registers the service worker, and tells the coach when the app is ready offline or has an update. */
@@ -8,8 +9,10 @@ export function UpdatePrompt() {
     offlineReady: [offlineReady, setOfflineReady],
     updateServiceWorker,
   } = useRegisterSW();
+  const sessionActive = useTimers((state) => state.session !== null);
 
-  if (!needRefresh && !offlineReady) return null;
+  // Held back during a session, so it can't push Split/Stop off the screen mid-piece.
+  if (sessionActive || (!needRefresh && !offlineReady)) return null;
 
   const dismiss = () => {
     setNeedRefresh(false);
