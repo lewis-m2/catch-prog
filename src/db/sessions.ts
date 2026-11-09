@@ -6,7 +6,7 @@ export async function loadActiveSession(): Promise<{ session: Session | null; pi
   const latest = await db.sessions.orderBy('startedAt').last();
   if (!latest || latest.endedAt !== undefined) return { session: null, piece: null };
   const piece = latest.currentPieceId ? await db.pieces.get(latest.currentPieceId) : undefined;
-  return { session: latest, piece: piece ?? null };
+  return { session: latest, piece: piece?.kind === 'simple' ? piece : null };
 }
 
 /** Saves records together: either all are written or none are. */

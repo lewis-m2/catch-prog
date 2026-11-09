@@ -8,9 +8,11 @@ import {
   endSession,
   pauseRowing,
   resumeRowing,
+  setCrewAdjustment,
   splitPiece,
   stopPiece,
   undoStopPiece,
+  type CrewAdjustment,
   type PieceDetails,
 } from '../lib/session';
 import { isRunning } from '../lib/time';
@@ -38,6 +40,13 @@ interface TimersState {
   undoStopPiece: () => void;
   resetPiece: () => void;
   setDetails: (details: Partial<PieceDetails>) => void;
+  /**
+   * For a staggered piece's START: starts the session (or ends a break) and adds
+   * adjustments made before there was a session. Returns the session.
+   */
+  ensureRowing: (at: number, adjustments: Record<string, CrewAdjustment>) => Session;
+  /** A crew's time for the rest of the session; null removes it. Needs a session. */
+  setAdjustment: (crewId: string, adjustment: CrewAdjustment | null) => void;
 }
 
 function save(records: { session?: Session; piece?: Piece }) {
@@ -113,6 +122,26 @@ export const useTimers = create<TimersState>()((set, get) => {
       // The piece itself is already saved; this just clears the clock.
       const next = { ...session, currentPieceId: undefined, updatedAt: Date.now() };
       set({ session: next, piece: null });
+      save({ session: next });
+    },
+
+    ensureRowing: (at, adjustments) => {
+      const { session: current } = get();
+      let session = current ? resumeRowing(current, at) : createSession(newId(), at);
+      for (const [crewId, adjustment] of Object.entries(adjustments)) {
+        // An adjustment already made in this session wins over one made before it.
+        if (!(crewId in session.crewAdjustments)) session = setCrewAdjustment(session, crewId, adjustment, at);
+      }
+      set({ session });
+      save({ session });
+      return session;
+    },
+
+    setAdjustment: (crewId, adjustment) => {
+      const { session } = get();
+      if (!session) return;
+      const next = setCrewAdjustment(session, crewId, adjustment, Date.now());
+      set({ session: next });
       save({ session: next });
     },
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { SessionBar } from './components/SessionBar';
+import { StaggerCues } from './components/StaggerCues';
 import { TabBar } from './components/TabBar';
 import { UpdatePrompt } from './components/UpdatePrompt';
 import { useApplyTheme } from './hooks/useTheme';
@@ -48,6 +49,7 @@ export function App() {
           </Routes>
         </Main>
         <UpdatePrompt />
+        <StaggerCues />
         <TabBar />
       </div>
     </HashRouter>

@@ -44,6 +44,16 @@ export function endSession(session: Session, at: number): Session {
   };
 }
 
+export type CrewAdjustment = Session['crewAdjustments'][string];
+
+/** Sets (or with null, removes) a crew's time for the rest of the session (SPEC §5a). */
+export function setCrewAdjustment(session: Session, crewId: string, adjustment: CrewAdjustment | null, at: number): Session {
+  const crewAdjustments = { ...session.crewAdjustments };
+  if (adjustment) crewAdjustments[crewId] = adjustment;
+  else delete crewAdjustments[crewId];
+  return { ...session, crewAdjustments, updatedAt: at };
+}
+
 export function sessionTimes(session: Session, now: number) {
   const end = session.endedAt ?? now;
   const totalMs = Math.max(0, end - session.startedAt);

@@ -10,12 +10,12 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 /**
  * Standard button: meets the minimum tap sizes and vibrates on tap.
- * Secondary buttons are 48px tall, the rest 64px. For anything that records a
+ * Secondary and outline buttons are 48px tall, the rest 64px. For anything that records a
  * time, use TimingButton instead.
  */
 export function BigButton({ variant = 'primary', size, className = '', onClick, type = 'button', ...rest }: Props) {
   const haptics = useHaptics();
-  const height = (size ?? (variant === 'secondary' ? 'control' : 'primary')) === 'control' ? 'min-h-control text-lg' : 'min-h-primary text-xl';
+  const height = (size ?? (variant === 'secondary' || variant === 'outline' ? 'control' : 'primary')) === 'control' ? 'min-h-control text-lg' : 'min-h-primary text-xl';
   return (
     <button
       type={type}

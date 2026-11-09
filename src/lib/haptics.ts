@@ -1,4 +1,6 @@
 export const HAPTIC_TAP: VibratePattern = 15;
+/** Each of the last seconds before a crew goes. */
+export const HAPTIC_COUNT: VibratePattern = 60;
 export const HAPTIC_GO: VibratePattern = [200, 100, 200];
 
 /** Vibrates if the device can. iOS has no vibration API, so this does nothing there. */

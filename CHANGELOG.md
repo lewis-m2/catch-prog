@@ -1,5 +1,48 @@
 # Changelog
 
+## Phase 4: Staggered pieces
+
+Crews of different speeds start at different times so they finish together (SPEC §5). Everything is on the Pieces tab.
+
+- **Setup:**
+  - Choose crews, then a distance or a time piece. Prediction is Linear or Paul's law.
+  - The start order and gaps update as you change anything.
+  - **Prog / Custom.** Prog uses session adjustment → crew override → table. Custom uses your own times for this piece, starting from each crew's time in its last piece.
+  - **Tap a crew** to adjust its 2k time in a sheet:
+    - Huge digits and a **drum picker** (0.5 s steps; fling for big changes).
+    - ±1 / ±5 s buttons, or switch to **% of prog**.
+    - **Apply to this session** sticks for every piece this session. Adjustments made before the session starts join it at START.
+    - **Save to crew** makes it the crew's permanent override.
+    - **Reset** goes back to the crew's own time.
+  - **Tap a start time** to move it by hand. It is marked "✎ set by hand" until you reset it.
+- **Ready:**
+  - The start list with a big **START**. Press it as the first crew goes.
+  - START also starts the session (or ends a break).
+- **Live:**
+  - Master clock, and a card per crew with its own elapsed time.
+  - The next crew gets a 5…1 countdown. Its card flashes green at **GO!** and the phone buzzes at 3-2-1 and GO, even on another tab.
+  - **Started** records a crew's real start (late or early); **Use planned start** undoes it.
+  - **FINISH** (96px) records the finish, with **Undo finish** for mis-taps.
+  - The SessionBar shows the master clock, and tapping it opens Pieces.
+- **Results:**
+  - Actual vs planned for each crew, with the difference as a sign and a word (`−2.4 s faster`), plus % of prog speed.
+  - **Use actual time** sets the crew's time for the rest of the session to what it just did.
+  - **Repeat piece** goes back to START with the same crews and distance and the updated times.
+  - **New piece**, or **Back to the piece** to fix a finish.
+- **Saving:**
+  - Pieces are saved to the session on every tap and survive a reload mid-piece.
+  - Cancel piece and End piece now both ask first.
+  - Ending the session puts the piece away.
+- **Maths:** in `lib/stagger.ts`, tested with the SPEC §5b worked example (C 0 s, B +15 s, A +30 s).
+- **Prognostic tables:** the same drum picker now appears when you edit a row.
+
+**How to try it**
+- Add 3 crews, go to Pieces, choose them, and pick 250 m so the starts are only a few seconds apart.
+- Tap a crew and roll the drum; tap a start and nudge it.
+- Go to start → START, and watch the countdown and GO on the next crew (with your phone's vibration on).
+- Finish each crew, then try Use actual time → Repeat piece.
+- Reload the page halfway through a piece: the clocks carry on.
+
 ## Phase 3: Crews, prognostics & settings
 
 **What changed**

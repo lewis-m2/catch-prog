@@ -1,4 +1,4 @@
-import { HAPTIC_GO, HAPTIC_TAP, vibrate } from '../lib/haptics';
+import { HAPTIC_COUNT, HAPTIC_GO, HAPTIC_TAP, vibrate } from '../lib/haptics';
 import { useSettings } from '../state/settings';
 
 // Checks the on/off setting at the moment of the tap, so it applies at once.
@@ -8,6 +8,7 @@ const whenOn = (pattern: VibratePattern) => () => {
 
 const haptics = {
   tap: whenOn(HAPTIC_TAP),
+  count: whenOn(HAPTIC_COUNT),
   go: whenOn(HAPTIC_GO),
 };
 

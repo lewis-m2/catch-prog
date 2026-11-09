@@ -6,6 +6,7 @@ import {
   pauseRowing,
   resumeRowing,
   sessionTimes,
+  setCrewAdjustment,
   splitPiece,
   splitRows,
   stopPiece,
@@ -101,5 +102,15 @@ describe('splitRows', () => {
 
   it('has no rows for a piece without splits', () => {
     expect(splitRows([], 103_000)).toEqual([]);
+  });
+});
+
+describe('crew adjustments', () => {
+  it('sets and removes a crew time for the session', () => {
+    const session = createSession('s', 0);
+    const set = setCrewAdjustment(session, 'c1', { prog2kSec: 400, source: 'manual' }, 5);
+    expect(set.crewAdjustments).toEqual({ c1: { prog2kSec: 400, source: 'manual' } });
+    expect(session.crewAdjustments).toEqual({});
+    expect(setCrewAdjustment(set, 'c1', null, 6).crewAdjustments).toEqual({});
   });
 });
