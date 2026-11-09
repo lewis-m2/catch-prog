@@ -28,7 +28,8 @@ export function App() {
     // HashRouter keeps the route after the #, so GitHub Pages only ever has to
     // serve index.html and a reload on any screen can't hit a 404.
     <HashRouter>
-      <div className="flex h-dvh flex-col">
+      {/* Pinned to the screen: only <main> scrolls, so the SessionBar and TabBar never move. */}
+      <div className="fixed inset-0 flex flex-col">
         <SessionBar />
         <Main>
           <Routes>
@@ -62,7 +63,9 @@ function Main({ children }: { children: ReactNode }) {
     ref.current?.scrollTo(0, 0);
   }, [pathname]);
   return (
-    <main ref={ref} className="min-h-0 flex-1 overflow-y-auto p-4">
+    // `relative` keeps hidden absolutely-positioned bits (like the sr-only file inputs) inside
+    // this scroll area. Without it they stretched the page and pushed both bars off screen.
+    <main ref={ref} className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
       {children}
     </main>
   );

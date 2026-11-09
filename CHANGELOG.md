@@ -30,6 +30,8 @@
   - Data: export a JSON backup, import one, and clear all data (asks twice). Import and clear wait until no session is running.
 - **Rate screen:** a crew chip above the pad. Readings are saved against the chosen crew.
 - The working-time rule is in `lib/prognostic.ts` and tested: session adjustment → crew override → table row.
+- **Bars always on screen:** the SessionBar (top) and TabBar (bottom) stay put on every screen. Before, a hidden file input on Settings made the whole page scroll and pushed both bars off. With the keyboard open, the content area shrinks instead of the page scrolling.
+- **Prognostic table order:** under each grade, women's boats come first, then men's, each running small to big (1x, 2x, 2-, 4x, 4x+, 4-, 4+, 8+). The CSV export uses the same order.
 
 **How to try it**
 - Crews: choose your programme, then add a crew, tap it, and set a crew override with the ± buttons.

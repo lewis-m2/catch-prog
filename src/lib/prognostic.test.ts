@@ -117,10 +117,18 @@ describe('mergeTable', () => {
     });
   });
 
-  it('sorts by programme, grade (slowest first), boat, then women before men', () => {
+  it('sorts by programme, grade (slowest first), women before men, then small boats up to big', () => {
     const table = mergeTable(DEFAULT_PROGNOSTICS, []);
-    expect(table[0]).toMatchObject({ program: 'school', grade: 'Novice', boatClass: '8+', gender: 'W' });
-    expect(table.at(-1)).toMatchObject({ program: 'club', grade: 'Premier', boatClass: '1x', gender: 'M' });
+    expect(table[0]).toMatchObject({ program: 'school', grade: 'Novice', gender: 'W' });
+    expect(table.at(-1)).toMatchObject({ program: 'club', grade: 'Premier', boatClass: '8+', gender: 'M' });
+
+    const u17 = table.filter((row) => row.program === 'school' && row.grade === 'U17');
+    const genders = u17.map((row) => row.gender);
+    expect(genders.indexOf('M')).toBeGreaterThan(genders.lastIndexOf('W'));
+    const womenBoats = u17.filter((row) => row.gender === 'W').map((row) => row.boatClass);
+    const order = ['1x', '2x', '2-', '4x', '4x+', '4-', '4+', '8+'];
+    expect(womenBoats).toEqual([...womenBoats].sort((a, b) => order.indexOf(a) - order.indexOf(b)));
+    expect(womenBoats.at(-1)).toBe('8+');
   });
 });
 

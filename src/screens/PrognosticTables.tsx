@@ -11,7 +11,10 @@ import { TimeEditor } from '../components/TimeEditor';
 import { resetProgram, resetRow, saveProgTime } from '../db/prognostics';
 import { useProgTable } from '../hooks/useData';
 import { formatProg, toPrognosticCsv, type PrognosticRow } from '../lib/prognostic';
-import { activePrograms, GENDER_LABEL, GRADES, PROGRAM_LABEL, type Program } from '../lib/programme';
+import { activePrograms, GENDER_LABEL, GRADES, PROGRAM_LABEL, type Gender, type Program } from '../lib/programme';
+
+/** Women's boats first, then men's, under each grade. */
+const GENDERS: Gender[] = ['W', 'M'];
 import { useSettings } from '../state/settings';
 
 /** The prognostic table for each active programme (SPEC §7b). Tap a row to edit it. */
@@ -62,26 +65,18 @@ export function PrognosticTables() {
           return (
             <section key={grade} aria-label={`${PROGRAM_LABEL[program]} ${grade}`}>
               <h2 className="mb-1 text-xl font-bold">{grade}</h2>
-              <ul className="flex flex-col">
-                {gradeRows.map((row) => (
-                  <li key={row.key}>
-                    <button
-                      type="button"
-                      onClick={() => setEditing(row)}
-                      aria-label={`${grade} ${row.boatClass} ${GENDER_LABEL[row.gender]} ${formatProg(row.prog2kSec)}${row.isOverride ? ', edited' : ''}`}
-                      className="flex min-h-control w-full items-center justify-between gap-3 border-b border-surface px-1 text-left text-lg active:bg-surface"
-                    >
-                      <span className="font-semibold">
-                        {row.boatClass} <span className="text-muted">{row.gender}</span>
-                      </span>
-                      <span className="time">
-                        {row.isOverride && <span aria-hidden="true">● </span>}
-                        {formatProg(row.prog2kSec)}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              {GENDERS.map((gender) => {
+                const genderRows = gradeRows.filter((row) => row.gender === gender);
+                if (genderRows.length === 0) return null;
+                return (
+                  <div key={gender} className="mb-3">
+                    <h3 className="mt-1 text-base font-semibold uppercase tracking-wide text-muted">
+                      {grade} {GENDER_LABEL[gender]}
+                    </h3>
+                    <RowList grade={grade} rows={genderRows} onEdit={setEditing} />
+                  </div>
+                );
+              })}
             </section>
           );
         })}
@@ -100,6 +95,30 @@ export function PrognosticTables() {
 
       {editing && <RowSheet row={editing} onClose={() => setEditing(null)} />}
     </>
+  );
+}
+
+/** One gender's rows within a grade, small boats first. */
+function RowList({ grade, rows, onEdit }: { grade: string; rows: PrognosticRow[]; onEdit: (row: PrognosticRow) => void }) {
+  return (
+    <ul className="flex flex-col">
+      {rows.map((row) => (
+        <li key={row.key}>
+          <button
+            type="button"
+            onClick={() => onEdit(row)}
+            aria-label={`${grade} ${row.boatClass} ${GENDER_LABEL[row.gender]} ${formatProg(row.prog2kSec)}${row.isOverride ? ', edited' : ''}`}
+            className="flex min-h-control w-full items-center justify-between gap-3 border-b border-surface px-1 text-left text-lg active:bg-surface"
+          >
+            <span className="font-semibold">{row.boatClass}</span>
+            <span className="time">
+              {row.isOverride && <span aria-hidden="true">● </span>}
+              {formatProg(row.prog2kSec)}
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 }
 

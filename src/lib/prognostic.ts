@@ -132,13 +132,14 @@ export function mergeTable(defaults: ProgEntry[], overrides: ProgEntry[]): Progn
   return sortTable(rows);
 }
 
-/** Programme, then grade (slowest first), then boat class, women before men. */
+/** Programme, then grade (slowest first), then women before men, then small boats up to big (1x … 8+). */
 export function sortTable<T extends ProgEvent>(rows: T[]): T[] {
   const rank = (row: T) => [
     PROGRAMS.indexOf(row.program),
     GRADES[row.program].indexOf(row.grade),
-    (BOAT_CLASSES as readonly string[]).indexOf(row.boatClass),
     row.gender === 'W' ? 0 : 1,
+    // BOAT_CLASSES runs big to small, so a higher index is a smaller boat and comes first.
+    -(BOAT_CLASSES as readonly string[]).indexOf(row.boatClass),
   ];
   return [...rows].sort((a, b) => {
     const ra = rank(a);
